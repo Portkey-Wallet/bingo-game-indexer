@@ -77,16 +77,11 @@ public class BingoGameIndexerCATestModule : AbpModule
             {
                 new ()
                 {
-                    ChainId = "AELF",
-                    CAContractAddress = "aLyxCJvWMQH6UEykTyeWAcYss9baPyXkrMQ37BHnUicxD2LL3",
-                    GenesisContractAddress = "genesis",
-                    NFTContractAddress = "nft",
-                    TokenContractAddress = "token"
+                    ChainId = "AELF"
                 },
                 new ()
                 {
-                    ChainId = "AELF",
-                    CAContractAddress = Address.FromPublicKey("AAA".HexToByteArray()).ToString(),
+                    ChainId = "AELF"
                 }
             };
         });
