@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using BingoGame.Indexer.CA.GraphQL;
 using BingoGame.Indexer.CA.Processors;
 using Volo.Abp.Modularity;
+using Portkey.Indexer.CA.Handlers;
 
 namespace BingoGame.Indexer.CA;
 
@@ -17,11 +18,12 @@ public class BingoGameIndexerCAModule:AElfIndexerClientPluginBaseModule<BingoGam
         var configuration = serviceCollection.GetConfiguration();
         serviceCollection.AddSingleton<IAElfLogEventProcessor<TransactionInfo>, BingoedProcessor>();
         serviceCollection.AddSingleton<IAElfLogEventProcessor<TransactionInfo>, PlayedProcessor>();
+        serviceCollection.AddTransient<IBlockChainDataHandler, BingoGameHandler>();
 
         Configure<ContractInfoOptions>(configuration.GetSection("ContractInfo"));
     }
 
-    protected override string ClientId => "AElfIndexer_DApp";
-    protected override string Version => "";
+    protected override string ClientId => "BingoGame_DApp";
+    protected override string Version => "9ee98e991aa448f5972c55f44ae35013";
 
 }
