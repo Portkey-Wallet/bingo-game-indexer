@@ -23,7 +23,7 @@ public class BingoGameIndexerCAModule:AElfIndexerClientPluginBaseModule<BingoGam
         Configure<ContractInfoOptions>(configuration.GetSection("ContractInfo"));
     }
 
-    protected override string ClientId => "BingoGame_DApp";
-    protected override string Version => "9ee98e991aa448f5972c55f44ae35013";
+    protected override string ClientId => "";
+    protected override string Version => "";
 
 }
