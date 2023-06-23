@@ -45,7 +45,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
         var index = await _bingoIndexRepository.GetFromBlockStateSetAsync(eventValue.PlayId.ToHex(), context.ChainId);
         if (index == null)
         {
-            return;
+            throw new Exception("Bingo index not found.");
         }
         // _objectMapper.Map<LogEventContext, CAHolderIndex>(context, caHolderIndex);
         index.BingoBlockHeight = context.BlockHeight;

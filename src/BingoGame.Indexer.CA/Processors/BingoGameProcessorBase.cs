@@ -35,7 +35,7 @@ public abstract class BingoGameProcessorBase<TEvent> : AElfLogEventProcessorBase
                                  new Dictionary<string, long>();
             foreach (var (symbol, fee) in resourceFeeMap)
             {
-                if (feeMap.TryGetValue(symbol, out _))
+                if (feeMap.ContainsKey(symbol))
                 {
                     feeMap[symbol] += fee;
                 }

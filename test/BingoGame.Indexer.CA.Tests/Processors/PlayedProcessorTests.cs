@@ -6,7 +6,6 @@ using AElfIndexer.Client.Handlers;
 using AElfIndexer.Grains.State.Client;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Portkey.Contracts.BingoGameContract;
-using Portkey.Contracts.CA;
 using BingoGame.Indexer.CA.Entities;
 using BingoGame.Indexer.CA.Processors;
 using BingoGame.Indexer.CA.Tests.Helper;

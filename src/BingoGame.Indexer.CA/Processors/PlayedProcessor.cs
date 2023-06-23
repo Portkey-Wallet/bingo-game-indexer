@@ -4,11 +4,8 @@ using AElfIndexer.Grains.State.Client;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Portkey.Contracts.BingoGameContract;
-using Portkey.Contracts.CA;
 using BingoGame.Indexer.CA.Entities;
-using BingoGame.Indexer.CA.GraphQL;
 using Volo.Abp.ObjectMapping;
 
 namespace BingoGame.Indexer.CA.Processors;
@@ -45,7 +42,7 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
         var index = await _bingoIndexRepository.GetFromBlockStateSetAsync(eventValue.PlayId.ToHex(), context.ChainId);
         if (index != null)
         {
-            return;
+            throw new Exception("This event is already handled.");
         }
         var feeMap = GetTransactionFee(context.ExtraProperties);
         List<TransactionFee> feeList;
