@@ -22,15 +22,7 @@ public class Query
         if (dto.CAAddresses != null)
         {
             var shouldQuery = new List<Func<QueryContainerDescriptor<BingoGameIndexEntry>, QueryContainer>>();
-            foreach (var address in dto.CAAddresses)
-            {
-                var mustQueryAddressInfo = new List<Func<QueryContainerDescriptor<BingoGameIndexEntry>, QueryContainer>>
-                {
-                    q => q.Term(i => i.Field(f => f.PlayerAddress).Value(address))
-                };
-                shouldQuery.Add(q => q.Bool(b => b.Must(mustQueryAddressInfo)));
-            }
-
+            shouldQuery.Add(q => q.Terms(i => i.Field(f => f.PlayerAddress).Terms(dto.CAAddresses)));
             mustQuery.Add(q => q.Bool(b => b.Should(shouldQuery)));
         }
 
@@ -46,15 +38,7 @@ public class Query
         if (dto.CAAddresses != null)
         {
             var statsShouldQuery = new List<Func<QueryContainerDescriptor<BingoGamestatsIndex>, QueryContainer>>();
-            foreach (var address in dto.CAAddresses)
-            {
-                var statsMustQueryAddressInfo = new List<Func<QueryContainerDescriptor<BingoGamestatsIndex>, QueryContainer>>
-                {
-                    q => q.Term(i => i.Field(f => f.PlayerAddress).Value(address))
-                };
-                statsShouldQuery.Add(q => q.Bool(b => b.Must(statsMustQueryAddressInfo)));
-            }
-
+            statsShouldQuery.Add(q => q.Terms(i => i.Field(f => f.PlayerAddress).Terms(dto.CAAddresses)));
             statsMustQuery.Add(q => q.Bool(b => b.Should(statsShouldQuery)));
         }
 
