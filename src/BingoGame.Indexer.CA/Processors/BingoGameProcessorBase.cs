@@ -1,7 +1,6 @@
 using AElf.CSharp.Core;
 using AElfIndexer.Client.Handlers;
 using AElfIndexer.Grains.State.Client;
-using BingoGame.Indexer.CA;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;

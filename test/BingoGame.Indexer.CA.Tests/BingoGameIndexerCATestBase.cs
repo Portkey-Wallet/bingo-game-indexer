@@ -1,9 +1,7 @@
 using AElfIndexer.Client.Providers;
 using AElfIndexer.Grains;
 using AElfIndexer.Grains.State.Client;
-using BingoGame.Indexer;
 using BingoGame.Indexer.Orleans.TestBase;
-using BingoGame.Indexer.TestBase;
 
 namespace BingoGame.Indexer.CA.Tests;
 

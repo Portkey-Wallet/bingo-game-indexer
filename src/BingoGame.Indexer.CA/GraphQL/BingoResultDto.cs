@@ -1,10 +1,6 @@
-using AElf.Indexing.Elasticsearch;
-using AElfIndexer.Client;
-using GraphQL;
-using Nest;
-using BingoGame.Indexer.CA.GraphQL;
+using BingoGame.Indexer.CA.Entities;
 
-namespace BingoGame.Indexer.CA.Entities;
+namespace BingoGame.Indexer.CA.GraphQL;
 
 public class BingoResultDto
 {
@@ -40,11 +36,4 @@ public class BingoStatics
     public long Award { get; set; }
     public long Amount { get; set; }
     public string PlayerAddress { get; set; }
-}
-
-public class TransactionFee
-{
-    public string Symbol { get; set; }
-    
-    public long Amount { get; set; }
 }

@@ -12,18 +12,16 @@ namespace BingoGame.Indexer.CA.Processors;
 
 public class PlayedProcessor : BingoGameProcessorBase<Played>
 {
-    private readonly IAElfIndexerClientEntityRepository<BingoGameIndex, TransactionInfo> _bingoIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> _bingoIndexRepository;
     private readonly IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, TransactionInfo> _bingoStaticsIndexRepository;
-    private readonly IObjectMapper _objectMapper;
     public PlayedProcessor(ILogger<PlayedProcessor> logger,
-        IAElfIndexerClientEntityRepository<BingoGameIndex, TransactionInfo> bingoIndexRepository,
+        IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> bingoIndexRepository,
         IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, TransactionInfo> bingoStaticsIndexRepository,
         IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IObjectMapper objectMapper) :
         base(logger,objectMapper,contractInfoOptions)
     {
         _bingoIndexRepository = bingoIndexRepository;
-        _objectMapper = objectMapper;
         _bingoStaticsIndexRepository = bingoStaticsIndexRepository;
     }
 
@@ -31,6 +29,14 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
     {
         return ContractInfoOptions.ContractInfos.First(c=>c.ChainId == chainId).BingoGameContractAddress;
     }
+    public class PlayEventAlreadyHandledException : Exception
+    {
+    public PlayEventAlreadyHandledException() : base("This event is already handled.")
+    {
+        return;
+    }
+    }
+    
 
     protected override async Task HandleEventAsync(Played eventValue, LogEventContext context)
     {   
@@ -40,9 +46,10 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
         }
 
         var index = await _bingoIndexRepository.GetFromBlockStateSetAsync(eventValue.PlayId.ToHex(), context.ChainId);
+        // we will throw exception if index is not null, because we should not have handled this event before
         if (index != null)
         {
-            throw new Exception("This event is already handled.");
+            throw new PlayEventAlreadyHandledException();
         }
         var feeMap = GetTransactionFee(context.ExtraProperties);
         List<TransactionFee> feeList;
@@ -66,7 +73,7 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
             };
         }
         // _objectMapper.Map<LogEventContext, CAHolderIndex>(context, caHolderIndex);
-        var bingoIndex = new BingoGameIndex
+        var bingoIndex = new BingoGameIndexEntry
         {
             Id = eventValue.PlayId.ToHex(),
             PlayBlockHeight = eventValue.PlayBlockHeight,
@@ -80,7 +87,7 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
             PlayTransactionFee = feeList,
             PlayBlockHash = context.BlockHash
         };
-        _objectMapper.Map<LogEventContext, BingoGameIndex>(context, bingoIndex);
+        ObjectMapper.Map<LogEventContext, BingoGameIndexEntry>(context, bingoIndex);
         await _bingoIndexRepository.AddOrUpdateAsync(bingoIndex);
     }
 }

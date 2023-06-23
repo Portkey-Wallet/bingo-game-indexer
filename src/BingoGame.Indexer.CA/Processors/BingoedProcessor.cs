@@ -6,33 +6,37 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portkey.Contracts.BingoGameContract;
 using BingoGame.Indexer.CA.Entities;
-using BingoGame.Indexer.CA.GraphQL;
 using Volo.Abp.ObjectMapping;
-using BingoGame.Indexer.CA.Processors;
 
 namespace BingoGame.Indexer.CA.Processors;
 
 public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
 {   
 
-    private readonly IAElfIndexerClientEntityRepository<BingoGameIndex, TransactionInfo> _bingoIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> _bingoIndexRepository;
     private readonly IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, TransactionInfo> _bingoStaticsIndexRepository;
-    private readonly IObjectMapper _objectMapper;
     public BingoedProcessor(ILogger<BingoedProcessor> logger,
-        IAElfIndexerClientEntityRepository<BingoGameIndex, TransactionInfo> bingoIndexRepository,
+        IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> bingoIndexRepository,
         IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, TransactionInfo> bingoStaticsIndexRepository,
         IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IObjectMapper objectMapper) :
         base(logger,objectMapper,contractInfoOptions)
     {
         _bingoIndexRepository = bingoIndexRepository;
-        _objectMapper = objectMapper;
         _bingoStaticsIndexRepository = bingoStaticsIndexRepository;
     }
 
     public override string GetContractAddress(string chainId)
     {
         return ContractInfoOptions.ContractInfos.First(c=>c.ChainId == chainId).BingoGameContractAddress;
+    }
+
+    public class BingoGameIndexEntryNotFoundException : Exception
+    {
+    public BingoGameIndexEntryNotFoundException() : base("Bingo index not found.")
+    {
+        return;
+    }
     }
 
     protected override async Task HandleEventAsync(Bingoed eventValue, LogEventContext context)
@@ -43,9 +47,10 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
         }
         //update bingoIndex
         var index = await _bingoIndexRepository.GetFromBlockStateSetAsync(eventValue.PlayId.ToHex(), context.ChainId);
+        // we will throw exception if index is null, because we should have played event after bingoed event
         if (index == null)
         {
-            throw new Exception("Bingo index not found.");
+            throw new BingoGameIndexEntryNotFoundException();
         }
         // _objectMapper.Map<LogEventContext, CAHolderIndex>(context, caHolderIndex);
         index.BingoBlockHeight = context.BlockHeight;
@@ -77,7 +82,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
         index.Dices = eventValue.Dices.Dices.ToList();
         index.Award = eventValue.Award;
         index.BingoBlockHash = context.BlockHash;
-        _objectMapper.Map<LogEventContext, BingoGameIndex>(context, index);
+        ObjectMapper.Map<LogEventContext, BingoGameIndexEntry>(context, index);
         await _bingoIndexRepository.AddOrUpdateAsync(index);
         
         //update bingoStaticsIndex
@@ -102,7 +107,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
             bingoStaticsIndex.TotalPlays += 1;
             bingoStaticsIndex.TotalWins += eventValue.Award > 0 ? 1 : 0;
         }
-        _objectMapper.Map<LogEventContext, BingoGameStaticsIndex>(context, bingoStaticsIndex);
+        ObjectMapper.Map<LogEventContext, BingoGameStaticsIndex>(context, bingoStaticsIndex);
         await _bingoStaticsIndexRepository.AddOrUpdateAsync(bingoStaticsIndex); 
     }
 }

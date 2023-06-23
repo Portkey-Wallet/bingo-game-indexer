@@ -1,5 +1,4 @@
 using AElfIndexer.Client;
-using Google.Protobuf.Collections;
 using Nest;
 
 namespace BingoGame.Indexer.CA.Entities;

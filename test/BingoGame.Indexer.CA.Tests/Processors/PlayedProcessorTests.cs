@@ -16,10 +16,10 @@ namespace BingoGame.Indexer.CA.Tests.Processors;
 
 public class PlayedLogEventProcessorTests: BingoGameIndexerCATestBase
 {
-    private readonly IAElfIndexerClientEntityRepository<BingoGameIndex, LogEventInfo> _bingoGameIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo> _bingoGameIndexRepository;
     public PlayedLogEventProcessorTests()
     {
-        _bingoGameIndexRepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameIndex, LogEventInfo>>();
+        _bingoGameIndexRepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo>>();
     }
     [Fact]
     public async Task HandlePlayedLogEventAsync_Test(){

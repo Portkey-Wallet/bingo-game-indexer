@@ -1,11 +1,10 @@
 using AElf.Indexing.Elasticsearch;
 using AElfIndexer.Client;
 using Nest;
-using BingoGame.Indexer.CA.GraphQL;
 
 namespace BingoGame.Indexer.CA.Entities;
 
-public class BingoGameIndex : AElfIndexerClientEntity<string>, IIndexBuild
+public class BingoGameIndexEntry : AElfIndexerClientEntity<string>, IIndexBuild
 {
     [Keyword]public long PlayBlockHeight { get; set; }
     [Keyword]public long BingoBlockHeight { get; set; }
@@ -23,4 +22,11 @@ public class BingoGameIndex : AElfIndexerClientEntity<string>, IIndexBuild
     [Keyword]public long BingoTime { get; set; }
     public List<TransactionFee> PlayTransactionFee { get; set; }
     public List<TransactionFee> BingoTransactionFee { get; set; }
+}
+
+public class TransactionFee
+{
+    public string Symbol { get; set; }
+    
+    public long Amount { get; set; }
 }

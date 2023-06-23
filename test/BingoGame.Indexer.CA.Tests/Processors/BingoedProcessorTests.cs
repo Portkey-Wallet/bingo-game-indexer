@@ -18,12 +18,12 @@ namespace BingoGame.Indexer.CA.Tests.Processors;
 
 public class BingoedProcessorTests: BingoGameIndexerCATestBase
 {
-    private readonly IAElfIndexerClientEntityRepository<BingoGameIndex, LogEventInfo> _bingoGameIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo> _bingoGameIndexRepository;
     private readonly IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, LogEventInfo> _staticsrepository;
     private readonly IObjectMapper _objectMapper;
     public BingoedProcessorTests()
     {
-        _bingoGameIndexRepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameIndex, LogEventInfo>>();
+        _bingoGameIndexRepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo>>();
         _staticsrepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, LogEventInfo>>();
         _objectMapper = GetRequiredService<IObjectMapper>();
     }

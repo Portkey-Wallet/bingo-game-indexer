@@ -1,7 +1,5 @@
 using AElf.Types;
 using AElfIndexer.Grains.State.Client;
-using Google.Protobuf;
-using Newtonsoft.Json;
 
 namespace BingoGame.Indexer.CA.Tests.Helper;
 
