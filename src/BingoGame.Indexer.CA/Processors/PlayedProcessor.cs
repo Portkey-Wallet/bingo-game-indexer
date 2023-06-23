@@ -13,16 +13,16 @@ namespace BingoGame.Indexer.CA.Processors;
 public class PlayedProcessor : BingoGameProcessorBase<Played>
 {
     private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> _bingoIndexRepository;
-    private readonly IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, TransactionInfo> _bingoStaticsIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndex, TransactionInfo> _bingostatsIndexRepository;
     public PlayedProcessor(ILogger<PlayedProcessor> logger,
         IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> bingoIndexRepository,
-        IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, TransactionInfo> bingoStaticsIndexRepository,
+        IAElfIndexerClientEntityRepository<BingoGamestatsIndex, TransactionInfo> bingostatsIndexRepository,
         IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IObjectMapper objectMapper) :
         base(logger,objectMapper,contractInfoOptions)
     {
         _bingoIndexRepository = bingoIndexRepository;
-        _bingoStaticsIndexRepository = bingoStaticsIndexRepository;
+        _bingostatsIndexRepository = bingostatsIndexRepository;
     }
 
     public override string GetContractAddress(string chainId)

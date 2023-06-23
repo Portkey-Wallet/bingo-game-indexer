@@ -11,7 +11,7 @@ public class Query
 {
     public static async Task<BingoResultDto> BingoGameInfo(
         [FromServices] IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo> repository,
-        [FromServices] IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, LogEventInfo> staticsrepository,
+        [FromServices] IAElfIndexerClientEntityRepository<BingoGamestatsIndex, LogEventInfo> statsrepository,
         [FromServices] IObjectMapper objectMapper,  GetBingoDto dto)
     {
         var mustQuery = new List<Func<QueryContainerDescriptor<BingoGameIndexEntry>, QueryContainer>>();
@@ -42,31 +42,31 @@ public class Query
             limit: dto.MaxResultCount);
         var dataList = objectMapper.Map<List<BingoGameIndexEntry>, List<BingoInfo>>(result.Item2);
         
-        var staticsMustQuery = new List<Func<QueryContainerDescriptor<BingoGameStaticsIndex>, QueryContainer>>();
+        var statsMustQuery = new List<Func<QueryContainerDescriptor<BingoGamestatsIndex>, QueryContainer>>();
         if (dto.CAAddresses != null)
         {
-            var staticsShouldQuery = new List<Func<QueryContainerDescriptor<BingoGameStaticsIndex>, QueryContainer>>();
+            var statsShouldQuery = new List<Func<QueryContainerDescriptor<BingoGamestatsIndex>, QueryContainer>>();
             foreach (var address in dto.CAAddresses)
             {
-                var staticsMustQueryAddressInfo = new List<Func<QueryContainerDescriptor<BingoGameStaticsIndex>, QueryContainer>>
+                var statsMustQueryAddressInfo = new List<Func<QueryContainerDescriptor<BingoGamestatsIndex>, QueryContainer>>
                 {
                     q => q.Term(i => i.Field(f => f.PlayerAddress).Value(address))
                 };
-                staticsShouldQuery.Add(q => q.Bool(b => b.Must(staticsMustQueryAddressInfo)));
+                statsShouldQuery.Add(q => q.Bool(b => b.Must(statsMustQueryAddressInfo)));
             }
 
-            staticsMustQuery.Add(q => q.Bool(b => b.Should(staticsShouldQuery)));
+            statsMustQuery.Add(q => q.Bool(b => b.Should(statsShouldQuery)));
         }
 
-        QueryContainer staticsFilter(QueryContainerDescriptor<BingoGameStaticsIndex> f) => f.Bool(b => b.Must(staticsMustQuery));
-        var staticsResult = await staticsrepository.GetListAsync(staticsFilter);
-        var staticsDataList = objectMapper.Map<List<BingoGameStaticsIndex>, List<BingoStatics>>(staticsResult.Item2);
+        QueryContainer statsFilter(QueryContainerDescriptor<BingoGamestatsIndex> f) => f.Bool(b => b.Must(statsMustQuery));
+        var statsResult = await statsrepository.GetListAsync(statsFilter);
+        var statsDataList = objectMapper.Map<List<BingoGamestatsIndex>, List<Bingostats>>(statsResult.Item2);
 
         var pageResult = new BingoResultDto
         {
             TotalRecordCount = result.Item1,
             Data = dataList,
-            Statics = staticsDataList,
+            stats = statsDataList,
         };
         return pageResult;
     }

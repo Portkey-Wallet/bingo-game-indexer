@@ -19,12 +19,12 @@ namespace BingoGame.Indexer.CA.Tests.Processors;
 public class BingoedProcessorTests: BingoGameIndexerCATestBase
 {
     private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo> _bingoGameIndexRepository;
-    private readonly IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, LogEventInfo> _staticsrepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndex, LogEventInfo> _statsrepository;
     private readonly IObjectMapper _objectMapper;
     public BingoedProcessorTests()
     {
         _bingoGameIndexRepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo>>();
-        _staticsrepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, LogEventInfo>>();
+        _statsrepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGamestatsIndex, LogEventInfo>>();
         _objectMapper = GetRequiredService<IObjectMapper>();
     }
     [Fact]
@@ -120,13 +120,13 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         bingoGameIndexData.PlayBlockHeight.ShouldBe(blockHeight);
         bingoGameIndexData.ChainId.ShouldBe(chainId);
 
-        var bingoGameStaticsIndexData = await _staticsrepository.GetAsync(IdGenerateHelper.GetId(chainId, bingoed.PlayerAddress.ToBase58()));
-        bingoGameStaticsIndexData.ShouldNotBeNull();
-        bingoGameStaticsIndexData.Amount.ShouldBe(100000000);
-        bingoGameStaticsIndexData.Award.ShouldBe(100000000);
-        bingoGameStaticsIndexData.TotalPlays.ShouldBe(1);
-        bingoGameStaticsIndexData.TotalWins.ShouldBe(1);
-        var result = await Query.BingoGameInfo(_bingoGameIndexRepository, _staticsrepository,
+        var bingoGamestatsIndexData = await _statsrepository.GetAsync(IdGenerateHelper.GetId(chainId, bingoed.PlayerAddress.ToBase58()));
+        bingoGamestatsIndexData.ShouldNotBeNull();
+        bingoGamestatsIndexData.Amount.ShouldBe(100000000);
+        bingoGamestatsIndexData.Award.ShouldBe(100000000);
+        bingoGamestatsIndexData.TotalPlays.ShouldBe(1);
+        bingoGamestatsIndexData.TotalWins.ShouldBe(1);
+        var result = await Query.BingoGameInfo(_bingoGameIndexRepository, _statsrepository,
             _objectMapper, new GetBingoDto
             {
                 CAAddresses = new List<string> {Address.FromPublicKey("AAA".HexToByteArray()).ToBase58()},
@@ -134,10 +134,10 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         result.TotalRecordCount.ShouldBe(1);
         result.Data[0].Amount.ShouldBe(100000000);
         result.Data[0].Award.ShouldBe(100000000);
-        result.Statics[0].Amount.ShouldBe(100000000);
-        result.Statics[0].Award.ShouldBe(100000000);
-        result.Statics[0].TotalPlays.ShouldBe(1);
-        result.Statics[0].TotalWins.ShouldBe(1);
+        result.stats[0].Amount.ShouldBe(100000000);
+        result.stats[0].Award.ShouldBe(100000000);
+        result.stats[0].TotalPlays.ShouldBe(1);
+        result.stats[0].TotalWins.ShouldBe(1);
         
     }
     [Fact]
@@ -388,7 +388,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
     await BlockStateSetSaveDataAsync<TransactionInfo>(blockStateSetKeyTransaction);
     await Task.Delay(2000);
 
-    var result = await Query.BingoGameInfo(_bingoGameIndexRepository, _staticsrepository,
+    var result = await Query.BingoGameInfo(_bingoGameIndexRepository, _statsrepository,
         _objectMapper, new GetBingoDto
         {
             CAAddresses = new List<string> {Address.FromPublicKey("AAA".HexToByteArray()).ToBase58()},
@@ -396,10 +396,10 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
     result.TotalRecordCount.ShouldBe(1);
     result.Data[0].Amount.ShouldBe(100000000);
     result.Data[0].Award.ShouldBe(100000000);
-    result.Statics[0].Amount.ShouldBe(200000000);
-    result.Statics[0].Award.ShouldBe(200000000);
-    result.Statics[0].TotalPlays.ShouldBe(2);
-    result.Statics[0].TotalWins.ShouldBe(2);        
+    result.stats[0].Amount.ShouldBe(200000000);
+    result.stats[0].Award.ShouldBe(200000000);
+    result.stats[0].TotalPlays.ShouldBe(2);
+    result.stats[0].TotalWins.ShouldBe(2);        
 }
     public async Task HandlePlayedLogEventAsync_Test(){
 

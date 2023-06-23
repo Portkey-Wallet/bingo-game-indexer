@@ -14,16 +14,16 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
 {   
 
     private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> _bingoIndexRepository;
-    private readonly IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, TransactionInfo> _bingoStaticsIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndex, TransactionInfo> _bingostatsIndexRepository;
     public BingoedProcessor(ILogger<BingoedProcessor> logger,
         IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> bingoIndexRepository,
-        IAElfIndexerClientEntityRepository<BingoGameStaticsIndex, TransactionInfo> bingoStaticsIndexRepository,
+        IAElfIndexerClientEntityRepository<BingoGamestatsIndex, TransactionInfo> bingostatsIndexRepository,
         IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IObjectMapper objectMapper) :
         base(logger,objectMapper,contractInfoOptions)
     {
         _bingoIndexRepository = bingoIndexRepository;
-        _bingoStaticsIndexRepository = bingoStaticsIndexRepository;
+        _bingostatsIndexRepository = bingostatsIndexRepository;
     }
 
     public override string GetContractAddress(string chainId)
@@ -85,14 +85,14 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
         ObjectMapper.Map<LogEventContext, BingoGameIndexEntry>(context, index);
         await _bingoIndexRepository.AddOrUpdateAsync(index);
         
-        //update bingoStaticsIndex
-        var staticsId= IdGenerateHelper.GetId(context.ChainId, eventValue.PlayerAddress.ToBase58());
-        var bingoStaticsIndex = await _bingoStaticsIndexRepository.GetFromBlockStateSetAsync(staticsId, context.ChainId);
-        if (bingoStaticsIndex == null)
+        //update bingostatsIndex
+        var statsId= IdGenerateHelper.GetId(context.ChainId, eventValue.PlayerAddress.ToBase58());
+        var bingostatsIndex = await _bingostatsIndexRepository.GetFromBlockStateSetAsync(statsId, context.ChainId);
+        if (bingostatsIndex == null)
         {
-            bingoStaticsIndex = new BingoGameStaticsIndex
+            bingostatsIndex = new BingoGamestatsIndex
             {
-                Id = staticsId,
+                Id = statsId,
                 PlayerAddress = eventValue.PlayerAddress.ToBase58(),
                 Amount = eventValue.Amount,
                 Award = eventValue.Award,
@@ -102,12 +102,12 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
         }
         else
         {
-            bingoStaticsIndex.Amount += eventValue.Amount;
-            bingoStaticsIndex.Award += eventValue.Award;
-            bingoStaticsIndex.TotalPlays += 1;
-            bingoStaticsIndex.TotalWins += eventValue.Award > 0 ? 1 : 0;
+            bingostatsIndex.Amount += eventValue.Amount;
+            bingostatsIndex.Award += eventValue.Award;
+            bingostatsIndex.TotalPlays += 1;
+            bingostatsIndex.TotalWins += eventValue.Award > 0 ? 1 : 0;
         }
-        ObjectMapper.Map<LogEventContext, BingoGameStaticsIndex>(context, bingoStaticsIndex);
-        await _bingoStaticsIndexRepository.AddOrUpdateAsync(bingoStaticsIndex); 
+        ObjectMapper.Map<LogEventContext, BingoGamestatsIndex>(context, bingostatsIndex);
+        await _bingostatsIndexRepository.AddOrUpdateAsync(bingostatsIndex); 
     }
 }

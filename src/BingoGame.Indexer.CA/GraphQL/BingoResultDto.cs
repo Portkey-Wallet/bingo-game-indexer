@@ -6,7 +6,7 @@ public class BingoResultDto
 {
     public long TotalRecordCount { get; set; }
     public List<BingoInfo> Data { get; set; }
-    public List<BingoStatics> Statics { get; set; }
+    public List<Bingostats> stats { get; set; }
 }
 
 public class BingoInfo 
@@ -29,7 +29,7 @@ public class BingoInfo
     public string BingoBlockHash { get; set; }
 }
 
-public class BingoStatics
+public class Bingostats
 {
     public long TotalWins { get; set; }
     public long TotalPlays { get; set; }
