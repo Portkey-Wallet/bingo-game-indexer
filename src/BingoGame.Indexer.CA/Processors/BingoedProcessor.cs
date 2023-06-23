@@ -14,10 +14,10 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
 {   
 
     private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> _bingoIndexRepository;
-    private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndex, TransactionInfo> _bingostatsIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, TransactionInfo> _bingostatsIndexRepository;
     public BingoedProcessor(ILogger<BingoedProcessor> logger,
         IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> bingoIndexRepository,
-        IAElfIndexerClientEntityRepository<BingoGamestatsIndex, TransactionInfo> bingostatsIndexRepository,
+        IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, TransactionInfo> bingostatsIndexRepository,
         IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IObjectMapper objectMapper) :
         base(logger,objectMapper,contractInfoOptions)
@@ -90,7 +90,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
         var bingostatsIndex = await _bingostatsIndexRepository.GetFromBlockStateSetAsync(statsId, context.ChainId);
         if (bingostatsIndex == null)
         {
-            bingostatsIndex = new BingoGamestatsIndex
+            bingostatsIndex = new BingoGamestatsIndexEntry
             {
                 Id = statsId,
                 PlayerAddress = eventValue.PlayerAddress.ToBase58(),
@@ -107,7 +107,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
             bingostatsIndex.TotalPlays += 1;
             bingostatsIndex.TotalWins += eventValue.Award > 0 ? 1 : 0;
         }
-        ObjectMapper.Map<LogEventContext, BingoGamestatsIndex>(context, bingostatsIndex);
+        ObjectMapper.Map<LogEventContext, BingoGamestatsIndexEntry>(context, bingostatsIndex);
         await _bingostatsIndexRepository.AddOrUpdateAsync(bingostatsIndex); 
     }
 }

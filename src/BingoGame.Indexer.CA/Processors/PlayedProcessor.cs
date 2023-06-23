@@ -13,10 +13,10 @@ namespace BingoGame.Indexer.CA.Processors;
 public class PlayedProcessor : BingoGameProcessorBase<Played>
 {
     private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> _bingoIndexRepository;
-    private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndex, TransactionInfo> _bingostatsIndexRepository;
+    private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, TransactionInfo> _bingostatsIndexRepository;
     public PlayedProcessor(ILogger<PlayedProcessor> logger,
         IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> bingoIndexRepository,
-        IAElfIndexerClientEntityRepository<BingoGamestatsIndex, TransactionInfo> bingostatsIndexRepository,
+        IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, TransactionInfo> bingostatsIndexRepository,
         IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IObjectMapper objectMapper) :
         base(logger,objectMapper,contractInfoOptions)

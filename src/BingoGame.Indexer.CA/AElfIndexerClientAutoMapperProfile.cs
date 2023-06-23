@@ -10,8 +10,8 @@ public class TestGraphQLAutoMapperProfile : Profile
     public TestGraphQLAutoMapperProfile()
     {
         CreateMap<BingoGameIndexEntry, BingoInfo>();
-        CreateMap<BingoGamestatsIndex, Bingostats>();
+        CreateMap<BingoGamestatsIndexEntry, Bingostats>();
         CreateMap<LogEventContext, BingoGameIndexEntry>();
-        CreateMap<LogEventContext, BingoGamestatsIndex>();
+        CreateMap<LogEventContext, BingoGamestatsIndexEntry>();
     }
 }

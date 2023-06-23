@@ -4,7 +4,7 @@ using Nest;
 
 namespace BingoGame.Indexer.CA.Entities;
 
-public class BingoGamestatsIndex : AElfIndexerClientEntity<string>, IIndexBuild
+public class BingoGamestatsIndexEntry : AElfIndexerClientEntity<string>, IIndexBuild
 {
     [Keyword]public long Amount { get; set; }
     [Keyword]public long Award { get; set; }

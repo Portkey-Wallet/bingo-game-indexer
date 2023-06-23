@@ -11,40 +11,39 @@ public class Query
 {
     public static async Task<BingoResultDto> BingoGameInfo(
         [FromServices] IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo> repository,
-        [FromServices] IAElfIndexerClientEntityRepository<BingoGamestatsIndex, LogEventInfo> statsrepository,
+        [FromServices] IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, LogEventInfo> statsrepository,
         [FromServices] IObjectMapper objectMapper,  GetBingoDto dto)
     {
-        var mustQuery = new List<Func<QueryContainerDescriptor<BingoGameIndexEntry>, QueryContainer>>();
+        var infoQuery = new List<Func<QueryContainerDescriptor<BingoGameIndexEntry>, QueryContainer>>();
 
-        mustQuery.Add(q => q.Term(i => i.Field(f => f.PlayId).Value(dto.PlayId)));
-        mustQuery.Add(q => q.Term(i => i.Field(f => f.IsComplete).Value(true)));
+        infoQuery.Add(q => q.Term(i => i.Field(f => f.PlayId).Value(dto.PlayId)));
+        infoQuery.Add(q => q.Term(i => i.Field(f => f.IsComplete).Value(true)));
 
         if (dto.CAAddresses != null)
         {
-            var shouldQuery = new List<Func<QueryContainerDescriptor<BingoGameIndexEntry>, QueryContainer>>();
-            shouldQuery.Add(q => q.Terms(i => i.Field(f => f.PlayerAddress).Terms(dto.CAAddresses)));
-            mustQuery.Add(q => q.Bool(b => b.Should(shouldQuery)));
+            infoQuery.Add(q => q.Terms(i => i.Field(f => f.PlayerAddress).Terms(dto.CAAddresses)));
         }
 
-        QueryContainer Filter(QueryContainerDescriptor<BingoGameIndexEntry> f) => f.Bool(b => b.Must(mustQuery));
+        
 
         Func<SortDescriptor<BingoGameIndexEntry>, IPromise<IList<ISort>>> sort = s =>
             s.Descending(a => a.BingoBlockHeight);
-        var result = await repository.GetSortListAsync(Filter, sortFunc: sort, skip: dto.SkipCount,
+        var result = await repository.GetSortListAsync(
+            f => f.Bool(b => b.Must(infoQuery)), 
+            sortFunc: s => s.Descending(a => a.BingoBlockHeight), 
+            skip: dto.SkipCount,
             limit: dto.MaxResultCount);
         var dataList = objectMapper.Map<List<BingoGameIndexEntry>, List<BingoInfo>>(result.Item2);
         
-        var statsMustQuery = new List<Func<QueryContainerDescriptor<BingoGamestatsIndex>, QueryContainer>>();
+        var statsQuery = new List<Func<QueryContainerDescriptor<BingoGamestatsIndexEntry>, QueryContainer>>();
         if (dto.CAAddresses != null)
         {
-            var statsShouldQuery = new List<Func<QueryContainerDescriptor<BingoGamestatsIndex>, QueryContainer>>();
-            statsShouldQuery.Add(q => q.Terms(i => i.Field(f => f.PlayerAddress).Terms(dto.CAAddresses)));
-            statsMustQuery.Add(q => q.Bool(b => b.Should(statsShouldQuery)));
+            statsQuery.Add(q => q.Terms(i => i.Field(f => f.PlayerAddress).Terms(dto.CAAddresses)));
         }
 
-        QueryContainer statsFilter(QueryContainerDescriptor<BingoGamestatsIndex> f) => f.Bool(b => b.Must(statsMustQuery));
+        QueryContainer statsFilter(QueryContainerDescriptor<BingoGamestatsIndexEntry> f) => f.Bool(b => b.Must(statsQuery));
         var statsResult = await statsrepository.GetListAsync(statsFilter);
-        var statsDataList = objectMapper.Map<List<BingoGamestatsIndex>, List<Bingostats>>(statsResult.Item2);
+        var statsDataList = objectMapper.Map<List<BingoGamestatsIndexEntry>, List<Bingostats>>(statsResult.Item2);
 
         var pageResult = new BingoResultDto
         {
