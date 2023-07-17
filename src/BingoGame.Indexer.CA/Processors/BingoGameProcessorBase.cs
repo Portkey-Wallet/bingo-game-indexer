@@ -1,6 +1,7 @@
 using AElf.CSharp.Core;
 using AElfIndexer.Client.Handlers;
 using AElfIndexer.Grains.State.Client;
+using BingoGame.Indexer.CA.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -46,5 +47,30 @@ public abstract class BingoGameProcessorBase<TEvent> : AElfLogEventProcessorBase
         }
 
         return feeMap;
+    }
+    protected List<TransactionFee> GetFeeList(Dictionary<string, string> extraProperties)
+    {
+        var feeMap = GetTransactionFee(extraProperties);
+        List<TransactionFee> feeList;
+        if (!feeMap.IsNullOrEmpty())
+        {
+            feeList = feeMap.Select(pair => new TransactionFee
+            {
+                Symbol = pair.Key,
+                Amount = pair.Value
+            }).ToList();
+        }
+        else
+        {
+            feeList = new List<TransactionFee>
+            {
+                new ()
+                {
+                    Symbol = null,
+                    Amount = 0
+                }
+            };
+        }
+        return feeList;
     }
 }
