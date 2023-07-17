@@ -28,7 +28,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
 
     public override string GetContractAddress(string chainId)
     {
-        return ContractInfoOptions.ContractInfos.First(c=>c.ChainId == chainId).BingoGameContractAddress;
+        return ContractInfoOptions.ContractInfos.First(c => c.ChainId == chainId).BingoGameContractAddress;
     }
 
     public class BingoGameIndexEntryNotFoundException : Exception
@@ -39,24 +39,9 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
     }
     }
 
-    protected override async Task HandleEventAsync(Bingoed eventValue, LogEventContext context)
+    private List<TransactionFee> GetFeeList(Dictionary<string, string> extraProperties)
     {
-        if (eventValue.PlayerAddress == null || eventValue.PlayerAddress.Value == null)
-        {
-            return;
-        }
-        //update bingoIndex
-        var index = await _bingoIndexRepository.GetFromBlockStateSetAsync(eventValue.PlayId.ToHex(), context.ChainId);
-        // we will throw exception if index is null, because we should have played event after bingoed event
-        if (index == null)
-        {
-            throw new BingoGameIndexEntryNotFoundException();
-        }
-        // _objectMapper.Map<LogEventContext, CAHolderIndex>(context, caHolderIndex);
-        index.BingoBlockHeight = context.BlockHeight;
-        index.BingoId = context.TransactionId;
-        index.BingoTime = context.BlockTime.ToTimestamp().Seconds;
-        var feeMap = GetTransactionFee(context.ExtraProperties);
+        var feeMap = GetTransactionFee(extraProperties);
         List<TransactionFee> feeList;
         if (!feeMap.IsNullOrEmpty())
         {
@@ -77,6 +62,26 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
                 }
             };
         }
+        return feeList;
+    }
+    protected override async Task HandleEventAsync(Bingoed eventValue, LogEventContext context)
+    {
+        if (eventValue.PlayerAddress == null || eventValue.PlayerAddress.Value == null)
+        {
+            return;
+        }
+        //update bingoIndex
+        var index = await _bingoIndexRepository.GetFromBlockStateSetAsync(eventValue.PlayId.ToHex(), context.ChainId);
+        // we will throw exception if index is null, because we should have played event after bingoed event
+        if (index == null)
+        {
+            throw new BingoGameIndexEntryNotFoundException();
+        }
+        // _objectMapper.Map<LogEventContext, CAHolderIndex>(context, caHolderIndex);
+        index.BingoBlockHeight = context.BlockHeight;
+        index.BingoId = context.TransactionId;
+        index.BingoTime = context.BlockTime.ToTimestamp().Seconds;
+        var feeList = GetFeeList(context.ExtraProperties);
         index.BingoTransactionFee = feeList;
         index.IsComplete = true;
         index.Dices = eventValue.Dices.Dices.ToList();
@@ -86,7 +91,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
         await _bingoIndexRepository.AddOrUpdateAsync(index);
         
         //update bingostatsIndex
-        var statsId= IdGenerateHelper.GetId(context.ChainId, eventValue.PlayerAddress.ToBase58());
+        var statsId= IdGenerateHelper.GenerateId(context.ChainId, eventValue.PlayerAddress.ToBase58());
         var bingostatsIndex = await _bingostatsIndexRepository.GetFromBlockStateSetAsync(statsId, context.ChainId);
         if (bingostatsIndex == null)
         {

@@ -121,7 +121,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         bingoGameIndexData.PlayBlockHeight.ShouldBe(blockHeight);
         bingoGameIndexData.ChainId.ShouldBe(chainId);
 
-        var bingoGamestatsIndexData = await _statsrepository.GetAsync(IdGenerateHelper.GetId(chainId, bingoed.PlayerAddress.ToBase58()));
+        var bingoGamestatsIndexData = await _statsrepository.GetAsync(IdGenerateHelper.GenerateId(chainId, bingoed.PlayerAddress.ToBase58()));
         bingoGamestatsIndexData.ShouldNotBeNull();
         bingoGamestatsIndexData.Amount.ShouldBe(100000000);
         bingoGamestatsIndexData.Award.ShouldBe(100000000);

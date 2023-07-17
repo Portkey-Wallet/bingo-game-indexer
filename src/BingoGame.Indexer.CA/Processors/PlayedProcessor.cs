@@ -27,7 +27,7 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
 
     public override string GetContractAddress(string chainId)
     {
-        return ContractInfoOptions.ContractInfos.First(c=>c.ChainId == chainId).BingoGameContractAddress;
+        return ContractInfoOptions.ContractInfos.First(c => c.ChainId == chainId).BingoGameContractAddress;
     }
     public class PlayEventAlreadyHandledException : Exception
     {
@@ -36,22 +36,10 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
         return;
     }
     }
-    
 
-    protected override async Task HandleEventAsync(Played eventValue, LogEventContext context)
-    {   
-        if (eventValue.PlayerAddress == null || eventValue.PlayerAddress.Value == null)
-        {
-            return;
-        }
-
-        var index = await _bingoIndexRepository.GetFromBlockStateSetAsync(eventValue.PlayId.ToHex(), context.ChainId);
-        // we will throw exception if index is not null, because we should not have handled this event before
-        if (index != null)
-        {
-            throw new PlayEventAlreadyHandledException();
-        }
-        var feeMap = GetTransactionFee(context.ExtraProperties);
+    private List<TransactionFee> GetFeeList(Dictionary<string, string> extraProperties)
+    {
+        var feeMap = GetTransactionFee(extraProperties);
         List<TransactionFee> feeList;
         if (!feeMap.IsNullOrEmpty())
         {
@@ -72,6 +60,23 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
                 }
             };
         }
+        return feeList;
+    }
+
+    protected override async Task HandleEventAsync(Played eventValue, LogEventContext context)
+    {   
+        if (eventValue.PlayerAddress == null || eventValue.PlayerAddress.Value == null)
+        {
+            return;
+        }
+
+        var index = await _bingoIndexRepository.GetFromBlockStateSetAsync(eventValue.PlayId.ToHex(), context.ChainId);
+        // we will throw exception if index is not null, because we should not have handled this event before
+        if (index != null)
+        {
+            throw new PlayEventAlreadyHandledException();
+        }
+        var feeList = GetFeeList(context.ExtraProperties);
         // _objectMapper.Map<LogEventContext, CAHolderIndex>(context, caHolderIndex);
         var bingoIndex = new BingoGameIndexEntry
         {

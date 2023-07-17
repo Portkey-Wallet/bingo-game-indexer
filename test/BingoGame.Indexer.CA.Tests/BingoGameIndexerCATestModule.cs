@@ -76,10 +76,6 @@ public class BingoGameIndexerCATestModule : AbpModule
                 new ()
                 {
                     ChainId = "AELF"
-                },
-                new ()
-                {
-                    ChainId = "AELF"
                 }
             };
         });

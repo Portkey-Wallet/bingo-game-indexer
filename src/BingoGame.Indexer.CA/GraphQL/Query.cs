@@ -26,8 +26,6 @@ public class Query
 
         
 
-        Func<SortDescriptor<BingoGameIndexEntry>, IPromise<IList<ISort>>> sort = s =>
-            s.Descending(a => a.BingoBlockHeight);
         var result = await repository.GetSortListAsync(
             f => f.Bool(b => b.Must(infoQuery)), 
             sortFunc: s => s.Descending(a => a.BingoBlockHeight), 
