@@ -126,8 +126,8 @@ public class PlayedLogEventProcessorTests: BingoGameIndexerCATestBase
             PreviousBlockHash = previousBlockHash
         };
 
-        var blockStateSetKey = await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
-        var blockStateSetKeyTransaction = await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
+        await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
+        await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
                 //step2: create logEventInfo
         var bingoed = new Played
         {

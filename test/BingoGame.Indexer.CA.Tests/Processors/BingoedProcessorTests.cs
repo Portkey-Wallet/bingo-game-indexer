@@ -135,10 +135,10 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         result.TotalRecordCount.ShouldBe(1);
         result.Data[0].Amount.ShouldBe(100000000);
         result.Data[0].Award.ShouldBe(100000000);
-        result.stats[0].Amount.ShouldBe(100000000);
-        result.stats[0].Award.ShouldBe(100000000);
-        result.stats[0].TotalPlays.ShouldBe(1);
-        result.stats[0].TotalWins.ShouldBe(1);
+        result.Stats[0].Amount.ShouldBe(100000000);
+        result.Stats[0].Award.ShouldBe(100000000);
+        result.Stats[0].TotalPlays.ShouldBe(1);
+        result.Stats[0].TotalWins.ShouldBe(1);
         
     }
     [Fact]
@@ -397,10 +397,10 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
     result.TotalRecordCount.ShouldBe(1);
     result.Data[0].Amount.ShouldBe(100000000);
     result.Data[0].Award.ShouldBe(100000000);
-    result.stats[0].Amount.ShouldBe(200000000);
-    result.stats[0].Award.ShouldBe(200000000);
-    result.stats[0].TotalPlays.ShouldBe(2);
-    result.stats[0].TotalWins.ShouldBe(2);        
+    result.Stats[0].Amount.ShouldBe(200000000);
+    result.Stats[0].Award.ShouldBe(200000000);
+    result.Stats[0].TotalPlays.ShouldBe(2);
+    result.Stats[0].TotalWins.ShouldBe(2);        
 }
     public async Task HandlePlayedLogEventAsync_Test(){
 
@@ -505,8 +505,8 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             PreviousBlockHash = previousBlockHash
         };
 
-        var blockStateSetKey = await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
-        var blockStateSetKeyTransaction = await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
+        await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
+        await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
         //step2: create logEventInfo
         var bingoed = new Bingoed
         {
