@@ -6,7 +6,7 @@ public class BingoResultDto
 {
     public long TotalRecordCount { get; set; }
     public List<BingoInfo> Data { get; set; }
-    public List<Bingostats> stats { get; set; }
+    public List<Bingostats> Stats { get; set; }
 }
 
 public class BingoInfo 

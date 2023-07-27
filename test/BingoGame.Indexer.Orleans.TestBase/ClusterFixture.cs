@@ -27,7 +27,7 @@ public class ClusterFixture:IDisposable,ISingletonDependency
     private class TestSiloConfigurations : ISiloBuilderConfigurator 
     {
         public void Configure(ISiloHostBuilder hostBuilder) {
-            hostBuilder.ConfigureServices(services => {
+            hostBuilder.ConfigureServices(_ => {
                     // services.AddSingleton<ITestGrain,TestGrain>();
                 })
                 .AddSimpleMessageStreamProvider(BingoGameIndexerOrleansConsts.MessageStreamName)

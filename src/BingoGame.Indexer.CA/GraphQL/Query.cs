@@ -39,15 +39,15 @@ public class Query
             statsQuery.Add(q => q.Terms(i => i.Field(f => f.PlayerAddress).Terms(dto.CAAddresses)));
         }
 
-        QueryContainer statsFilter(QueryContainerDescriptor<BingoGamestatsIndexEntry> f) => f.Bool(b => b.Must(statsQuery));
-        var statsResult = await statsrepository.GetListAsync(statsFilter);
+        QueryContainer StatsFilter(QueryContainerDescriptor<BingoGamestatsIndexEntry> f) => f.Bool(b => b.Must(statsQuery));
+        var statsResult = await statsrepository.GetListAsync(StatsFilter);
         var statsDataList = objectMapper.Map<List<BingoGamestatsIndexEntry>, List<Bingostats>>(statsResult.Item2);
 
         var pageResult = new BingoResultDto
         {
             TotalRecordCount = result.Item1,
             Data = dataList,
-            stats = statsDataList,
+            Stats = statsDataList,
         };
         return pageResult;
     }

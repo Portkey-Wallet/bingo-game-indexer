@@ -35,7 +35,6 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
     {
     public BingoGameIndexEntryNotFoundException() : base("Bingo index not found.")
     {
-        return;
     }
     }
 
@@ -63,7 +62,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
         index.Dices = eventValue.Dices.Dices.ToList();
         index.Award = eventValue.Award;
         index.BingoBlockHash = context.BlockHash;
-        ObjectMapper.Map<LogEventContext, BingoGameIndexEntry>(context, index);
+        ObjectMapper.Map(context, index);
         await _bingoIndexRepository.AddOrUpdateAsync(index);
         
         //update bingostatsIndex
@@ -88,7 +87,7 @@ public class BingoedProcessor : BingoGameProcessorBase<Bingoed>
             bingostatsIndex.TotalPlays += 1;
             bingostatsIndex.TotalWins += eventValue.Award > 0 ? 1 : 0;
         }
-        ObjectMapper.Map<LogEventContext, BingoGamestatsIndexEntry>(context, bingostatsIndex);
+        ObjectMapper.Map(context, bingostatsIndex);
         await _bingostatsIndexRepository.AddOrUpdateAsync(bingostatsIndex); 
     }
 }

@@ -3,9 +3,9 @@ using AElfIndexer.Client.Handlers;
 using AElfIndexer.Grains.State.Client;
 using Microsoft.Extensions.DependencyInjection;
 using BingoGame.Indexer.CA.GraphQL;
+using BingoGame.Indexer.CA.Handlers;
 using BingoGame.Indexer.CA.Processors;
 using Volo.Abp.Modularity;
-using Portkey.Indexer.CA.Handlers;
 
 namespace BingoGame.Indexer.CA;
 

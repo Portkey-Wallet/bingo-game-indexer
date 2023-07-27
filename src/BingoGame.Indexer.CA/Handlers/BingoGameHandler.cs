@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Volo.Abp.ObjectMapping;
 
-namespace Portkey.Indexer.CA.Handlers;
+namespace BingoGame.Indexer.CA.Handlers;
 
 public class BingoGameHandler : TransactionDataHandler
 {

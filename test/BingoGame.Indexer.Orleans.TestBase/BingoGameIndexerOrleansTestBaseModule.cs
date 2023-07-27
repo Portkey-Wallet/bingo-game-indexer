@@ -19,7 +19,7 @@ public class BingoGameIndexerOrleansTestBaseModule:AbpModule
         if(_fixture == null)
             _fixture = new ClusterFixture();
         // var fixture = new ClusterFixture();
-        context.Services.AddSingleton<ClusterFixture>(_fixture);
-        context.Services.AddSingleton<IClusterClient>(sp => _fixture.Cluster.Client);
+        context.Services.AddSingleton(_fixture);
+        context.Services.AddSingleton<IClusterClient>(_ => _fixture.Cluster.Client);
     }
 }

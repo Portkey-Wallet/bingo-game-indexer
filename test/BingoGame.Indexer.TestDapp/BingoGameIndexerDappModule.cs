@@ -49,7 +49,7 @@ public class BingoGameIndexerDappModule : AbpModule
     
     private static void ConfigureOrleans(ServiceConfigurationContext context, IConfiguration configuration)
     {
-        context.Services.AddSingleton<IClusterClient>(o =>
+        context.Services.AddSingleton(o =>
         {
             return new ClientBuilder()
                 .ConfigureDefaults()
