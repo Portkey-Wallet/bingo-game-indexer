@@ -61,7 +61,7 @@ public class BingoGameIndexerDappModule : AbpModule
                 .UseMongoDBClient(configuration["Orleans:MongoDBClient"])
                 .UseMongoDBClustering(options =>
                 {
-                    options.DatabaseName = configuration["Orleans:DataBase"];;
+                    options.DatabaseName = configuration["Orleans:DataBase"];
                     options.Strategy = MongoDBMembershipStrategy.SingleDocument;
                 })
                 .Configure<ClusterOptions>(options =>
@@ -93,13 +93,19 @@ public class BingoGameIndexerDappModule : AbpModule
         {
             options.AddDefaultPolicy(builder =>
             {
+                var corsOrigins = configuration["App:CorsOrigins"];
+                if (!string.IsNullOrEmpty(corsOrigins))
+                {
+                    builder
+                        .WithOrigins(
+                            corsOrigins
+                                .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                                .Select(o => o.RemovePostFix("/"))
+                                .ToArray()
+                        );
+                }
+
                 builder
-                    .WithOrigins(
-                        configuration["App:CorsOrigins"]
-                            .Split(",", StringSplitOptions.RemoveEmptyEntries)
-                            .Select(o => o.RemovePostFix("/"))
-                            .ToArray()
-                    )
                     .WithAbpExposedHeaders()
                     .SetIsOriginAllowedToAllowWildcardSubdomains()
                     .AllowAnyHeader()
@@ -108,6 +114,7 @@ public class BingoGameIndexerDappModule : AbpModule
             });
         });
     }
+
 
     public override void OnPreApplicationInitialization(ApplicationInitializationContext context)
     {

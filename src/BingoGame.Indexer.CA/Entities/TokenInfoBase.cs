@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using AElfIndexer.Client;
 using Nest;
 
 namespace BingoGame.Indexer.CA.Entities;
 
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class TokenInfoBase: AElfIndexerClientEntity<string>
 {
     [Keyword] public override string Id { get; set; }

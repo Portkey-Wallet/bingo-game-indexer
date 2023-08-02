@@ -24,16 +24,20 @@ public class ClusterFixture:IDisposable,ISingletonDependency
 
     public TestCluster Cluster { get; private set; }
     
-    private class TestSiloConfigurations : ISiloBuilderConfigurator 
+    private class TestSiloConfigurations : ISiloConfigurator
     {
-        public void Configure(ISiloHostBuilder hostBuilder) {
-            hostBuilder.ConfigureServices(_ => {
-                    // services.AddSingleton<ITestGrain,TestGrain>();
-                })
-                .AddSimpleMessageStreamProvider(BingoGameIndexerOrleansConsts.MessageStreamName)
-                .AddMemoryGrainStorage("PubSubStore")
-                .AddMemoryGrainStorageAsDefault();
-        }
+        
+        public void Configure(ISiloBuilder siloBuilder)
+        {
+           
+        siloBuilder.ConfigureServices(_ => {
+                // services.AddSingleton<ITestGrain,TestGrain>();
+            })
+            .AddSimpleMessageStreamProvider(BingoGameIndexerOrleansConsts.MessageStreamName)
+            .AddMemoryGrainStorage("PubSubStore")
+            .AddMemoryGrainStorageAsDefault();
+            }
+        
     }
     
     private class TestClientBuilderConfigurator : IClientBuilderConfigurator

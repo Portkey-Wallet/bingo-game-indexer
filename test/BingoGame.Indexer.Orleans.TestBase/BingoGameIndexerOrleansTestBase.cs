@@ -11,6 +11,7 @@ public abstract class BingoGameIndexerOrleansTestBase<TStartupModule>:BingoGameI
 
     public BingoGameIndexerOrleansTestBase()
     {
+        // ReSharper disable once VirtualMemberCallInConstructor
         Cluster = GetRequiredService<ClusterFixture>().Cluster;
     }
 }
