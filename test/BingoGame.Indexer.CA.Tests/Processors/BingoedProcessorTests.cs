@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AElf;
 using AElf.CSharp.Core.Extension;
 using AElf.Types;
@@ -17,21 +18,27 @@ using static BingoGame.Indexer.CA.Processors.BingoedProcessor;
 
 namespace BingoGame.Indexer.CA.Tests.Processors;
 
-public class BingoedProcessorTests: BingoGameIndexerCATestBase
+[SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
+public class BingoedProcessorTests : BingoGameIndexerCATestBase
 {
     private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo> _bingoGameIndexRepository;
     private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, LogEventInfo> _statsrepository;
     private readonly IObjectMapper _objectMapper;
+
     public BingoedProcessorTests()
     {
-        _bingoGameIndexRepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo>>();
-        _statsrepository = GetRequiredService<IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, LogEventInfo>>();
+        _bingoGameIndexRepository =
+            GetRequiredService<IAElfIndexerClientEntityRepository<BingoGameIndexEntry, LogEventInfo>>();
+        _statsrepository =
+            GetRequiredService<IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, LogEventInfo>>();
         _objectMapper = GetRequiredService<IObjectMapper>();
     }
-    [Fact]
-    public async Task HandleBingoedLogEventAsync_Test(){
 
-        await HandlePlayedLogEventAsync_Test();
+    [Fact]
+    public async Task HandleBingoedLogEventAsync_Test()
+    {
+
+        await HandlePlayedLogEventAsync();
         //step1: create blockStateSet
         const string chainId = "AELF";
         const string blockHash = "3c7c267341e9f097b0886c8a1661bef73d6bb4c30464ad73be714fdf22b09bdd";
@@ -45,7 +52,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             Confirmed = true,
             PreviousBlockHash = previousBlockHash
         };
-        
+
         var blockStateSetTransaction = new BlockStateSet<TransactionInfo>
         {
             BlockHash = blockHash,
@@ -68,7 +75,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             Type = BingoType.Large,
             Dices = new DiceList
             {
-                Dices = {1, 2, 6}
+                Dices = { 1, 2, 6 }
             },
             PlayId = HashHelper.ComputeFrom("PlayId")
         };
@@ -95,11 +102,11 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             BlockTime = DateTime.UtcNow
         };
         var bingoedLogEventProcessor = GetRequiredService<BingoedProcessor>();
-        
+
         await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
-        
+
         bingoedLogEventProcessor.GetContractAddress(chainId);
-        
+
         //step4: save blockStateSet into es
         await BlockStateSetSaveDataAsync<LogEventInfo>(blockStateSetKey);
         await BlockStateSetSaveDataAsync<TransactionInfo>(blockStateSetKeyTransaction);
@@ -121,7 +128,8 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         bingoGameIndexData.PlayBlockHeight.ShouldBe(blockHeight);
         bingoGameIndexData.ChainId.ShouldBe(chainId);
 
-        var bingoGamestatsIndexData = await _statsrepository.GetAsync(IdGenerateHelper.GenerateId(chainId, bingoed.PlayerAddress.ToBase58()));
+        var bingoGamestatsIndexData =
+            await _statsrepository.GetAsync(IdGenerateHelper.GenerateId(chainId, bingoed.PlayerAddress.ToBase58()));
         bingoGamestatsIndexData.ShouldNotBeNull();
         bingoGamestatsIndexData.Amount.ShouldBe(100000000);
         bingoGamestatsIndexData.Award.ShouldBe(100000000);
@@ -130,7 +138,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         var result = await Query.BingoGameInfo(_bingoGameIndexRepository, _statsrepository,
             _objectMapper, new GetBingoDto
             {
-                CAAddresses = new List<string> {Address.FromPublicKey("AAA".HexToByteArray()).ToBase58()},
+                CAAddresses = new List<string> { Address.FromPublicKey("AAA".HexToByteArray()).ToBase58() },
             });
         result.TotalRecordCount.ShouldBe(1);
         result.Data[0].Amount.ShouldBe(100000000);
@@ -139,12 +147,14 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         result.Stats[0].Award.ShouldBe(100000000);
         result.Stats[0].TotalPlays.ShouldBe(1);
         result.Stats[0].TotalWins.ShouldBe(1);
-        
-    }
-    [Fact]
-    public async Task HandleBingoedLogEventAsync_Negative_Award_Test(){
 
-        await HandlePlayedLogEventAsync_Test();
+    }
+
+    [Fact]
+    public async Task HandleBingoedLogEventAsync_Negative_Award_Test()
+    {
+
+        await HandlePlayedLogEventAsync();
         //step1: create blockStateSet
         const string chainId = "AELF";
         const string blockHash = "3c7c267341e9f097b0886c8a1661bef73d6bb4c30464ad73be714fdf22b09bdd";
@@ -158,7 +168,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             Confirmed = true,
             PreviousBlockHash = previousBlockHash
         };
-        
+
         var blockStateSetTransaction = new BlockStateSet<TransactionInfo>
         {
             BlockHash = blockHash,
@@ -181,7 +191,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             Type = BingoType.Large,
             Dices = new DiceList
             {
-                Dices = {1, 2, 6}
+                Dices = { 1, 2, 6 }
             },
             PlayId = HashHelper.ComputeFrom("PlayId")
         };
@@ -208,11 +218,11 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             BlockTime = DateTime.UtcNow
         };
         var bingoedLogEventProcessor = GetRequiredService<BingoedProcessor>();
-        
+
         await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
-        
+
         bingoedLogEventProcessor.GetContractAddress(chainId);
-        
+
         //step4: save blockStateSet into es
         await BlockStateSetSaveDataAsync<LogEventInfo>(blockStateSetKey);
         await BlockStateSetSaveDataAsync<TransactionInfo>(blockStateSetKeyTransaction);
@@ -232,177 +242,183 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         bingoGameIndexData.PlayTransactionFee[0].Symbol.ShouldBe("ELF");
         bingoGameIndexData.PlayBlockHash.ShouldBe(blockHash);
         bingoGameIndexData.PlayBlockHeight.ShouldBe(blockHeight);
-        bingoGameIndexData.ChainId.ShouldBe(chainId);  
+        bingoGameIndexData.ChainId.ShouldBe(chainId);
     }
+
     [Fact]
-    public async Task HandleBingoedLogEventAsync_InvaildInput_Test(){
-    //step1: create blockStateSet
-    const string chainId = "AELF";
-    const string blockHash = "3c7c267341e9f097b0886c8a1661bef73d6bb4c30464ad73be714fdf22b09bdd";
-    const string previousBlockHash = "9a6ef475e4c4b6f15c37559033bcfdbed34ca666c67b2ae6be22751a3ae171de";
-    const string transactionId = "c09b8c142dd5e07acbc1028e5f59adca5b5be93a0680eb3609b773044a852c43";
-    const long blockHeight = 200;
-    var blockStateSetAdded = new BlockStateSet<LogEventInfo>
+    public async Task HandleBingoedLogEventAsync_InvaildInput_Test()
     {
-        BlockHash = blockHash,
-        BlockHeight = blockHeight,
-        Confirmed = true,
-        PreviousBlockHash = previousBlockHash
-    };
-    
-    var blockStateSetTransaction = new BlockStateSet<TransactionInfo>
-    {
-        BlockHash = blockHash,
-        BlockHeight = blockHeight,
-        Confirmed = true,
-        PreviousBlockHash = previousBlockHash
-    };
-
-    var blockStateSetKey = await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
-    var blockStateSetKeyTransaction = await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
-    //step2: create logEventInfo
-    var bingoed = new Bingoed
-    {
-        PlayBlockHeight = blockHeight,
-        BingoBlockHeight = blockHeight,
-        Amount = 100000000,
-        Award = 100000000,
-        IsComplete = true,
-        Type = BingoType.Large,
-        Dices = new DiceList
+        //step1: create blockStateSet
+        const string chainId = "AELF";
+        const string blockHash = "3c7c267341e9f097b0886c8a1661bef73d6bb4c30464ad73be714fdf22b09bdd";
+        const string previousBlockHash = "9a6ef475e4c4b6f15c37559033bcfdbed34ca666c67b2ae6be22751a3ae171de";
+        const string transactionId = "c09b8c142dd5e07acbc1028e5f59adca5b5be93a0680eb3609b773044a852c43";
+        const long blockHeight = 200;
+        var blockStateSetAdded = new BlockStateSet<LogEventInfo>
         {
-            Dices = {1, 2, 6}
-        },
-        PlayId = HashHelper.ComputeFrom("PlayId")
-    };
-    var logEventInfo = LogEventHelper.ConvertAElfLogEventToLogEventInfo(bingoed.ToLogEvent());
-    logEventInfo.BlockHeight = blockHeight;
-    logEventInfo.ChainId = chainId;
-    logEventInfo.BlockHash = blockHash;
-    logEventInfo.TransactionId = transactionId;
-    var logEventContext = new LogEventContext
-    {
-        ChainId = chainId,
-        BlockHeight = blockHeight,
-        BlockHash = blockHash,
-        PreviousBlockHash = previousBlockHash,
-        TransactionId = transactionId,
-        Params = "{ \"to\": \"ca\", \"symbol\": \"ELF\", \"amount\": \"100000000000\" }",
-        To = "CAAddress",
-        MethodName = "Bingoed",
-        ExtraProperties = new Dictionary<string, string>
-        {
-            { "TransactionFee", "{\"ELF\":\"30000000\"}" },
-            { "ResourceFee", "{\"ELF\":\"30000000\"}" }
-        },
-        BlockTime = DateTime.UtcNow
-    };
-    var bingoedLogEventProcessor = GetRequiredService<BingoedProcessor>();
-    
-    await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
-    
-    bingoedLogEventProcessor.GetContractAddress(chainId);
-    
-    //step4: save blockStateSet into es
-    await BlockStateSetSaveDataAsync<LogEventInfo>(blockStateSetKey);
-    await BlockStateSetSaveDataAsync<TransactionInfo>(blockStateSetKeyTransaction);
-    await Task.Delay(2000);
+            BlockHash = blockHash,
+            BlockHeight = blockHeight,
+            Confirmed = true,
+            PreviousBlockHash = previousBlockHash
+        };
 
-    var bingoGameIndexData = await _bingoGameIndexRepository.GetAsync(HashHelper.ComputeFrom("PlayId").ToHex());
-    bingoGameIndexData.ShouldBeNull();
-        
+        var blockStateSetTransaction = new BlockStateSet<TransactionInfo>
+        {
+            BlockHash = blockHash,
+            BlockHeight = blockHeight,
+            Confirmed = true,
+            PreviousBlockHash = previousBlockHash
+        };
+
+        var blockStateSetKey = await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
+        var blockStateSetKeyTransaction = await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
+        //step2: create logEventInfo
+        var bingoed = new Bingoed
+        {
+            PlayBlockHeight = blockHeight,
+            BingoBlockHeight = blockHeight,
+            Amount = 100000000,
+            Award = 100000000,
+            IsComplete = true,
+            Type = BingoType.Large,
+            Dices = new DiceList
+            {
+                Dices = { 1, 2, 6 }
+            },
+            PlayId = HashHelper.ComputeFrom("PlayId")
+        };
+        var logEventInfo = LogEventHelper.ConvertAElfLogEventToLogEventInfo(bingoed.ToLogEvent());
+        logEventInfo.BlockHeight = blockHeight;
+        logEventInfo.ChainId = chainId;
+        logEventInfo.BlockHash = blockHash;
+        logEventInfo.TransactionId = transactionId;
+        var logEventContext = new LogEventContext
+        {
+            ChainId = chainId,
+            BlockHeight = blockHeight,
+            BlockHash = blockHash,
+            PreviousBlockHash = previousBlockHash,
+            TransactionId = transactionId,
+            Params = "{ \"to\": \"ca\", \"symbol\": \"ELF\", \"amount\": \"100000000000\" }",
+            To = "CAAddress",
+            MethodName = "Bingoed",
+            ExtraProperties = new Dictionary<string, string>
+            {
+                { "TransactionFee", "{\"ELF\":\"30000000\"}" },
+                { "ResourceFee", "{\"ELF\":\"30000000\"}" }
+            },
+            BlockTime = DateTime.UtcNow
+        };
+        var bingoedLogEventProcessor = GetRequiredService<BingoedProcessor>();
+
+        await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
+
+        bingoedLogEventProcessor.GetContractAddress(chainId);
+
+        //step4: save blockStateSet into es
+        await BlockStateSetSaveDataAsync<LogEventInfo>(blockStateSetKey);
+        await BlockStateSetSaveDataAsync<TransactionInfo>(blockStateSetKeyTransaction);
+        await Task.Delay(2000);
+
+        var bingoGameIndexData = await _bingoGameIndexRepository.GetAsync(HashHelper.ComputeFrom("PlayId").ToHex());
+        bingoGameIndexData.ShouldBeNull();
+
     }
+
     [Fact]
-    public async Task HandleBingoedLogEventAsync_secondGame_Test(){
-    await HandlePlayedLogEventAsync_Test();
-    await HandleBingoedLogEventAsync_Test();
-    //step1: create blockStateSet
-    const string chainId = "AELF";
-    const string blockHash = "3c7c267341e9f097b0886c8a1661bef73d6bb4c30464ad73be714fdf22b09bdd";
-    const string previousBlockHash = "9a6ef475e4c4b6f15c37559033bcfdbed34ca666c67b2ae6be22751a3ae171de";
-    const string transactionId = "c09b8c142dd5e07acbc1028e5f59adca5b5be93a0680eb3609b773044a852c43";
-    const long blockHeight = 200;
-    var blockStateSetAdded = new BlockStateSet<LogEventInfo>
+    public async Task HandleBingoedLogEventAsync_secondGame_Test()
     {
-        BlockHash = blockHash,
-        BlockHeight = blockHeight,
-        Confirmed = true,
-        PreviousBlockHash = previousBlockHash
-    };
-    
-    var blockStateSetTransaction = new BlockStateSet<TransactionInfo>
-    {
-        BlockHash = blockHash,
-        BlockHeight = blockHeight,
-        Confirmed = true,
-        PreviousBlockHash = previousBlockHash
-    };
+        await HandlePlayedLogEventAsync();
+        await HandleBingoedLogEventAsync_Test();
+        //step1: create blockStateSet
+        const string chainId = "AELF";
+        const string blockHash = "3c7c267341e9f097b0886c8a1661bef73d6bb4c30464ad73be714fdf22b09bdd";
+        const string previousBlockHash = "9a6ef475e4c4b6f15c37559033bcfdbed34ca666c67b2ae6be22751a3ae171de";
+        const string transactionId = "c09b8c142dd5e07acbc1028e5f59adca5b5be93a0680eb3609b773044a852c43";
+        const long blockHeight = 200;
+        var blockStateSetAdded = new BlockStateSet<LogEventInfo>
+        {
+            BlockHash = blockHash,
+            BlockHeight = blockHeight,
+            Confirmed = true,
+            PreviousBlockHash = previousBlockHash
+        };
 
-    var blockStateSetKey = await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
-    var blockStateSetKeyTransaction = await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
-    //step2: create logEventInfo
-    var bingoed = new Bingoed
-    {
-        PlayBlockHeight = blockHeight,
-        PlayerAddress = Address.FromPublicKey("AAA".HexToByteArray()),
-        BingoBlockHeight = blockHeight,
-        Amount = 100000000,
-        Award = 100000000,
-        IsComplete = true,
-        Type = BingoType.Large,
-        Dices = new DiceList
+        var blockStateSetTransaction = new BlockStateSet<TransactionInfo>
         {
-            Dices = {1, 2, 6}
-        },
-        PlayId = HashHelper.ComputeFrom("PlayId")
-    };
-    var logEventInfo = LogEventHelper.ConvertAElfLogEventToLogEventInfo(bingoed.ToLogEvent());
-    logEventInfo.BlockHeight = blockHeight;
-    logEventInfo.ChainId = chainId;
-    logEventInfo.BlockHash = blockHash;
-    logEventInfo.TransactionId = transactionId;
-    var logEventContext = new LogEventContext
-    {
-        ChainId = chainId,
-        BlockHeight = blockHeight,
-        BlockHash = blockHash,
-        PreviousBlockHash = previousBlockHash,
-        TransactionId = transactionId,
-        Params = "{ \"to\": \"ca\", \"symbol\": \"ELF\", \"amount\": \"100000000000\" }",
-        To = "CAAddress",
-        MethodName = "Bingoed",
-        ExtraProperties = new Dictionary<string, string>
-        {
-            { "TransactionFee", "{\"ELF\":\"30000000\"}" },
-            { "ResourceFee", "{\"ELF\":\"30000000\"}" }
-        },
-        BlockTime = DateTime.UtcNow
-    };
-    var bingoedLogEventProcessor = GetRequiredService<BingoedProcessor>();
-    
-    await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
-    
-    bingoedLogEventProcessor.GetContractAddress(chainId);
-    
-    //step4: save blockStateSet into es
-    await BlockStateSetSaveDataAsync<LogEventInfo>(blockStateSetKey);
-    await BlockStateSetSaveDataAsync<TransactionInfo>(blockStateSetKeyTransaction);
-    await Task.Delay(2000);
+            BlockHash = blockHash,
+            BlockHeight = blockHeight,
+            Confirmed = true,
+            PreviousBlockHash = previousBlockHash
+        };
 
-    var result = await Query.BingoGameInfo(_bingoGameIndexRepository, _statsrepository,
-        _objectMapper, new GetBingoDto
+        var blockStateSetKey = await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
+        var blockStateSetKeyTransaction = await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
+        //step2: create logEventInfo
+        var bingoed = new Bingoed
         {
-            CAAddresses = new List<string> {Address.FromPublicKey("AAA".HexToByteArray()).ToBase58()},
-        });
-    result.TotalRecordCount.ShouldBe(1);
-    result.Data[0].Amount.ShouldBe(100000000);
-    result.Data[0].Award.ShouldBe(100000000);
-    result.Stats[0].Amount.ShouldBe(200000000);
-    result.Stats[0].Award.ShouldBe(200000000);
-    result.Stats[0].TotalPlays.ShouldBe(2);
-    result.Stats[0].TotalWins.ShouldBe(2);        
-}
-    public async Task HandlePlayedLogEventAsync_Test(){
+            PlayBlockHeight = blockHeight,
+            PlayerAddress = Address.FromPublicKey("AAA".HexToByteArray()),
+            BingoBlockHeight = blockHeight,
+            Amount = 100000000,
+            Award = 100000000,
+            IsComplete = true,
+            Type = BingoType.Large,
+            Dices = new DiceList
+            {
+                Dices = { 1, 2, 6 }
+            },
+            PlayId = HashHelper.ComputeFrom("PlayId")
+        };
+        var logEventInfo = LogEventHelper.ConvertAElfLogEventToLogEventInfo(bingoed.ToLogEvent());
+        logEventInfo.BlockHeight = blockHeight;
+        logEventInfo.ChainId = chainId;
+        logEventInfo.BlockHash = blockHash;
+        logEventInfo.TransactionId = transactionId;
+        var logEventContext = new LogEventContext
+        {
+            ChainId = chainId,
+            BlockHeight = blockHeight,
+            BlockHash = blockHash,
+            PreviousBlockHash = previousBlockHash,
+            TransactionId = transactionId,
+            Params = "{ \"to\": \"ca\", \"symbol\": \"ELF\", \"amount\": \"100000000000\" }",
+            To = "CAAddress",
+            MethodName = "Bingoed",
+            ExtraProperties = new Dictionary<string, string>
+            {
+                { "TransactionFee", "{\"ELF\":\"30000000\"}" },
+                { "ResourceFee", "{\"ELF\":\"30000000\"}" }
+            },
+            BlockTime = DateTime.UtcNow
+        };
+        var bingoedLogEventProcessor = GetRequiredService<BingoedProcessor>();
+
+        await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
+
+        bingoedLogEventProcessor.GetContractAddress(chainId);
+
+        //step4: save blockStateSet into es
+        await BlockStateSetSaveDataAsync<LogEventInfo>(blockStateSetKey);
+        await BlockStateSetSaveDataAsync<TransactionInfo>(blockStateSetKeyTransaction);
+        await Task.Delay(2000);
+
+        var result = await Query.BingoGameInfo(_bingoGameIndexRepository, _statsrepository,
+            _objectMapper, new GetBingoDto
+            {
+                CAAddresses = new List<string> { Address.FromPublicKey("AAA".HexToByteArray()).ToBase58() },
+            });
+        result.TotalRecordCount.ShouldBe(1);
+        result.Data[0].Amount.ShouldBe(100000000);
+        result.Data[0].Award.ShouldBe(100000000);
+        result.Stats[0].Amount.ShouldBe(200000000);
+        result.Stats[0].Award.ShouldBe(200000000);
+        result.Stats[0].TotalPlays.ShouldBe(2);
+        result.Stats[0].TotalWins.ShouldBe(2);
+    }
+
+    private async Task HandlePlayedLogEventAsync()
+    {
 
         //step1: create blockStateSet
         const string chainId = "AELF";
@@ -417,7 +433,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             Confirmed = true,
             PreviousBlockHash = previousBlockHash
         };
-        
+
         var blockStateSetTransaction = new BlockStateSet<TransactionInfo>
         {
             BlockHash = blockHash,
@@ -428,11 +444,11 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
 
         var blockStateSetKey = await InitializeBlockStateSetAsync(blockStateSetAdded, chainId);
         var blockStateSetKeyTransaction = await InitializeBlockStateSetAsync(blockStateSetTransaction, chainId);
-                //step2: create logEventInfo
+        //step2: create logEventInfo
         var bingoed = new Played
         {
             PlayBlockHeight = blockHeight,
-            PlayerAddress = Address.FromPublicKey("AAA".HexToByteArray()),       
+            PlayerAddress = Address.FromPublicKey("AAA".HexToByteArray()),
             Amount = 100000000,
             Type = BingoType.Large,
             PlayId = HashHelper.ComputeFrom("PlayId"),
@@ -461,11 +477,11 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             BlockTime = DateTime.UtcNow
         };
         var bingoedLogEventProcessor = GetRequiredService<PlayedProcessor>();
-        
+
         await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
-        
+
         bingoedLogEventProcessor.GetContractAddress(chainId);
-        
+
         //step4: save blockStateSet into es
         await BlockStateSetSaveDataAsync<LogEventInfo>(blockStateSetKey);
         await BlockStateSetSaveDataAsync<TransactionInfo>(blockStateSetKeyTransaction);
@@ -481,8 +497,10 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
         bingoGameIndexData.PlayBlockHeight.ShouldBe(blockHeight);
         bingoGameIndexData.ChainId.ShouldBe(chainId);
     }
+
     [Fact]
-    public async Task Handle_unplayed_BingoedLogEventAsync_Test(){
+    public async Task Handle_unplayed_BingoedLogEventAsync_Test()
+    {
         //step1: create blockStateSet
         const string chainId = "AELF";
         const string blockHash = "3c7c267341e9f097b0886c8a1661bef73d6bb4c30464ad73be714fdf22b09bdd";
@@ -496,7 +514,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             Confirmed = true,
             PreviousBlockHash = previousBlockHash
         };
-        
+
         var blockStateSetTransaction = new BlockStateSet<TransactionInfo>
         {
             BlockHash = blockHash,
@@ -519,7 +537,7 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             Type = BingoType.Large,
             Dices = new DiceList
             {
-                Dices = {1, 2, 6}
+                Dices = { 1, 2, 6 }
             },
             PlayId = HashHelper.ComputeFrom("PlayId")
         };
@@ -546,9 +564,10 @@ public class BingoedProcessorTests: BingoGameIndexerCATestBase
             BlockTime = DateTime.UtcNow
         };
         var bingoedLogEventProcessor = GetRequiredService<BingoedProcessor>();
-        Assert.ThrowsAsync<BingoGameIndexEntryNotFoundException>(async () =>
-        {
-            await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
-        }); 
+
+        //todo: mock logger
+        await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
+        var bingoGameIndexData = await _bingoGameIndexRepository.GetAsync(HashHelper.ComputeFrom("PlayId").ToHex());
+        bingoGameIndexData.ShouldBeNull();
     }
 }
