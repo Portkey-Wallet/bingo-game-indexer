@@ -172,16 +172,9 @@ public class PlayedLogEventProcessorTests : BingoGameIndexerCATestBase
             },
             BlockTime = DateTime.UtcNow
         };
-        var mockLogger = new Mock<ILogger<PlayedProcessor>>();
-        var mockRepository = new Mock<IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo>>();
-        var mockContractInfoOptions = new Mock<IOptionsSnapshot<ContractInfoOptions>>();
-        var mockObjectMapper = new Mock<IObjectMapper>();
-        var playedProcessor = new PlayedProcessor(
-            mockLogger.Object,
-            mockRepository.Object,
-            mockContractInfoOptions.Object,
-            mockObjectMapper.Object
-        );
+        var bingoedLogEventProcessor = GetRequiredService<PlayedProcessor>();
+        await bingoedLogEventProcessor.HandleEventAsync(logEventInfo, logEventContext);
+        
         var bingoGameIndexData = await _bingoGameIndexRepository.GetAsync(HashHelper.ComputeFrom("PlayId").ToHex());
         bingoGameIndexData.ShouldNotBeNull();
     }
