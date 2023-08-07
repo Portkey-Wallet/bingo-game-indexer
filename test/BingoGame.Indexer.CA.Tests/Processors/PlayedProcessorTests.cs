@@ -9,13 +9,8 @@ using Portkey.Contracts.BingoGameContract;
 using BingoGame.Indexer.CA.Entities;
 using BingoGame.Indexer.CA.Processors;
 using BingoGame.Indexer.CA.Tests.Helper;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
 using Shouldly;
-using Volo.Abp.ObjectMapping;
 using Xunit;
-using static BingoGame.Indexer.CA.Processors.PlayedProcessor;
 
 
 namespace BingoGame.Indexer.CA.Tests.Processors;

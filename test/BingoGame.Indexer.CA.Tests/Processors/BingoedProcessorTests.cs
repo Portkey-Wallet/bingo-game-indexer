@@ -14,7 +14,6 @@ using BingoGame.Indexer.CA.Tests.Helper;
 using Shouldly;
 using Volo.Abp.ObjectMapping;
 using Xunit;
-using static BingoGame.Indexer.CA.Processors.BingoedProcessor;
 
 namespace BingoGame.Indexer.CA.Tests.Processors;
 
