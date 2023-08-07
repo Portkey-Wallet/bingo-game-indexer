@@ -104,7 +104,7 @@ public class BingoGameIndexerCATestModule : AbpModule
         var mockBlockScanAppService = new Mock<IBlockScanAppService>();
         mockBlockScanAppService.Setup(p => p.GetMessageStreamIdsAsync(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.FromResult(new List<Guid>()));
-        context.Services.AddSingleton<IBlockScanAppService>(mockBlockScanAppService.Object);
+        context.Services.AddSingleton(mockBlockScanAppService.Object);
         // context.Services.AddSingleton<IClusterClient>((new Mock<IClusterClient>()).Object);
     }
 

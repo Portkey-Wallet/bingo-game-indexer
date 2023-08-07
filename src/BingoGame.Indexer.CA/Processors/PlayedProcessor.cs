@@ -13,16 +13,14 @@ namespace BingoGame.Indexer.CA.Processors;
 public class PlayedProcessor : BingoGameProcessorBase<Played>
 {
     private readonly IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> _bingoIndexRepository;
-    private readonly IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, TransactionInfo> _bingostatsIndexRepository;
+
     public PlayedProcessor(ILogger<PlayedProcessor> logger,
         IAElfIndexerClientEntityRepository<BingoGameIndexEntry, TransactionInfo> bingoIndexRepository,
-        IAElfIndexerClientEntityRepository<BingoGamestatsIndexEntry, TransactionInfo> bingostatsIndexRepository,
         IOptionsSnapshot<ContractInfoOptions> contractInfoOptions,
         IObjectMapper objectMapper) :
         base(logger,objectMapper,contractInfoOptions)
     {
         _bingoIndexRepository = bingoIndexRepository;
-        _bingostatsIndexRepository = bingostatsIndexRepository;
     }
 
     public override string GetContractAddress(string chainId)
@@ -33,7 +31,6 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
     {
     public PlayEventAlreadyHandledException() : base("This event is already handled.")
     {
-        return;
     }
     }
 
@@ -60,13 +57,13 @@ public class PlayedProcessor : BingoGameProcessorBase<Played>
             IsComplete = false,
             PlayId = context.TransactionId,
             BingoType = (int)eventValue.Type,
-            Dices = new List<int>{},
+            Dices = new List<int>(),
             PlayerAddress = eventValue.PlayerAddress.ToBase58(),
             PlayTime = context.BlockTime.ToTimestamp().Seconds,
             PlayTransactionFee = feeList,
             PlayBlockHash = context.BlockHash
         };
-        ObjectMapper.Map<LogEventContext, BingoGameIndexEntry>(context, bingoIndex);
+        ObjectMapper.Map(context, bingoIndex);
         await _bingoIndexRepository.AddOrUpdateAsync(bingoIndex);
     }
 }

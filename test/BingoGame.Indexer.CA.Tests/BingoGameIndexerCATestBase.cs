@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AElfIndexer.Client.Providers;
 using AElfIndexer.Grains;
 using AElfIndexer.Grains.State.Client;
@@ -5,6 +6,7 @@ using BingoGame.Indexer.Orleans.TestBase;
 
 namespace BingoGame.Indexer.CA.Tests;
 
+[SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
 public abstract class BingoGameIndexerCATestBase: BingoGameIndexerOrleansTestBase<BingoGameIndexerCATestModule>
 {
     private readonly IAElfIndexerClientInfoProvider _indexerClientInfoProvider;

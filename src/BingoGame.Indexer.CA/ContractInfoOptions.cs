@@ -8,5 +8,6 @@ public class ContractInfoOptions
 public class ContractInfo
 {
     public string ChainId { get; set; }
-    public string BingoGameContractAddress { get; set; }
+    // ReSharper disable once UnassignedGetOnlyAutoProperty
+    public string BingoGameContractAddress { get; }
 }

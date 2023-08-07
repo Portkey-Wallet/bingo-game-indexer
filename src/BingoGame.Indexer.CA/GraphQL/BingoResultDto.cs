@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using BingoGame.Indexer.CA.Entities;
 
 namespace BingoGame.Indexer.CA.GraphQL;
@@ -6,9 +7,10 @@ public class BingoResultDto
 {
     public long TotalRecordCount { get; set; }
     public List<BingoInfo> Data { get; set; }
-    public List<Bingostats> stats { get; set; }
+    public List<Bingostats> Stats { get; set; }
 }
 
+[SuppressMessage("ReSharper", "CollectionNeverUpdated.Global")]
 public class BingoInfo 
 {
     public long Amount { get; set; }

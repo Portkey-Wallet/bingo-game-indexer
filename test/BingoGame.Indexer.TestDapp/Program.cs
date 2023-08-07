@@ -35,7 +35,7 @@ public class Program
 
         try
         {
-            Log.Information("Starting AElfIndexer.Dapp.");
+            Log.Information("Starting AElfIndexer.Dapp");
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
