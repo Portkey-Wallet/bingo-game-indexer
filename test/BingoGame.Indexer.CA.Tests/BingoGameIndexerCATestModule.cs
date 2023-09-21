@@ -15,6 +15,7 @@ using BingoGame.Indexer.Orleans.TestBase;
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;
 
@@ -35,6 +36,9 @@ public class BingoGameIndexerCATestModule : AbpModule
 
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        var mockEventbus = new Mock<IDistributedEventBus>();
+        mockEventbus.Setup(x => x.PublishAsync(It.IsAny<object>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.CompletedTask);
+        context.Services.AddSingleton(mockEventbus.Object);
         Configure<AbpAutoMapperOptions>(options => { options.AddMaps<BingoGameIndexerCATestModule>(); });
         context.Services.AddSingleton<IAElfIndexerClientInfoProvider, AElfIndexerClientInfoProvider>();
         context.Services.AddSingleton<ISubscribedBlockHandler, SubscribedBlockHandler>();

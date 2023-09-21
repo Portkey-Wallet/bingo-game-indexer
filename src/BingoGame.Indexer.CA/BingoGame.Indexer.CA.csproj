@@ -4,6 +4,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="AElfIndexer.Client" Version="1.0.0-24" />
+      <PackageReference Include="AElfIndexer.Client" Version="1.0.0-28" />
     </ItemGroup>
 </Project>
