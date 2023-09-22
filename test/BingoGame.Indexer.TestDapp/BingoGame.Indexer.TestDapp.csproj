@@ -7,7 +7,7 @@
     <ItemGroup>
         <PackageReference Include="AElf.Indexing.Elasticsearch" Version="0.0.14" />
         <PackageReference Include="AElfIndexer.Application" Version="1.0.0-24" />
-        <PackageReference Include="AElfIndexer.Client" Version="1.0.0-24" />
+        <PackageReference Include="AElfIndexer.Client" Version="1.0.0-28" />
         <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
         <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
